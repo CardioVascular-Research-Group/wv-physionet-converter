@@ -22,7 +22,7 @@ public class WvReaderTest {
     public void testRead() {
 
         try {
-            WvReader reader = new WvReader(new File("testData/testBits"));
+            WvReader reader = new WvReader(new File("testData/test.wv"));
             List<Short> shorts = reader.allShorts();
             assertTrue(1 == shorts.get(0));
             assertTrue(257 == shorts.get(1));
