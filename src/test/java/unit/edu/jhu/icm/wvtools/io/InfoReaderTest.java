@@ -1,4 +1,4 @@
-package unit;
+package unit.edu.jhu.icm.wvtools.io;
 
 import edu.jhu.icm.wvtools.io.InfoReader;
 import edu.jhu.icm.wvtools.io.InfoReaderException;
