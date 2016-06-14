@@ -81,6 +81,14 @@ public class InfoReader {
     }
 
     /**
+     * Gets number of channels.
+     * @return Number of channels.
+     */
+    public int getNumChannels() {
+        return channelNames.size();
+    }
+
+    /**
      * Gets units for each channel.
      * @return List of units for each channel.
      */
