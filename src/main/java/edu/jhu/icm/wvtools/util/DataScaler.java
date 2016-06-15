@@ -9,6 +9,15 @@ import java.util.List;
  */
 public class DataScaler {
 
+    public List<Double> scaleBytes(List<Byte> data, double factor) {
+        List<Double> results = new ArrayList<>();
+
+        for (Byte b : data) {
+            results.add(factor * b.doubleValue());
+        }
+        return results;
+    }
+
     /**
      * Scales all numbers in the list by the factor specified.
      * @param data Data to scale.

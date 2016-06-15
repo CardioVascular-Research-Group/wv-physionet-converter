@@ -12,11 +12,13 @@ public class PhysioNetHeaderWriter {
     private WvReader wvReader;
 
     /**
-     * Initializes a header writer with the info read from the info file infoReader.
-     * @param infoReader Info file infoReader.
+     * Initializes a writer with data about a wv entry.
+     * @param infoReader InfoReader with data from info file.
+     * @param wvReader WvReader with waveform data.
      */
     public PhysioNetHeaderWriter(InfoReader infoReader, WvReader wvReader) {
         this.infoReader = infoReader;
+        this.wvReader = wvReader;
     }
 
 

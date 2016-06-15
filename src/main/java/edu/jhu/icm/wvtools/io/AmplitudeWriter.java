@@ -27,7 +27,7 @@ public class AmplitudeWriter {
         // Millisecond increment per data point
         double increment = 1000.0 / samplingFrequency;
 
-        DateFormat format = new SimpleDateFormat("dd MMM yyyy kk:mm:ss:SS");
+        DateFormat format = new SimpleDateFormat("MM/dd/yy kk:mm:ss:SS");
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         PrintWriter printWriter = new PrintWriter(os);
