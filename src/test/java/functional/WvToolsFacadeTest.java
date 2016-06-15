@@ -21,4 +21,9 @@ public class WvToolsFacadeTest {
     public void testRawOutput() {
         facade.generateRawOutput("testData/test", false);
     }
+
+    @Test
+    public void testScaledOutput() {
+        facade.generateScaledOutput("testData/test", false);
+    }
 }
