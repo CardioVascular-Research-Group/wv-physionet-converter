@@ -37,6 +37,8 @@ public class Driver {
 
             WvToolsFacade facade = new WvToolsFacade();
 
+            // Could check conflicts between function flags. We leave it up to the user not to though.
+
             if (raw) {
                 facade.generateRawOutput(inputPrefix, noHeaders);
             } else if (physionet) {

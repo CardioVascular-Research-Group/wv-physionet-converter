@@ -1,88 +1,71 @@
 package edu.jhu.icm.wvtools;
 
-import edu.jhu.icm.wvtools.io.InfoReader;
-import edu.jhu.icm.wvtools.io.InfoReaderException;
-import edu.jhu.icm.wvtools.io.WvReader;
+import edu.jhu.icm.wvtools.io.*;
 import edu.jhu.icm.wvtools.util.DataDeinterlacer;
 import edu.jhu.icm.wvtools.util.DataScaler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 /**
- * Facade that dispatches calls from driver.
+ * Facade pattern; dispatches calls from driver.
  * Created by ran on 6/14/16.
  */
 public class WvToolsFacade {
 
+    private void generateOutput(String inputPrefix, boolean scale, boolean noHeaders) {
+        try {
+            InfoReader infoReader = new InfoReader(inputPrefix);
+            WvReader wvReader = new WvReader(new File(inputPrefix + ".wv"));
+
+            AmplitudeWriter writer = new AmplitudeWriter();
+            DataScaler scaler = new DataScaler();
+
+            DataDeinterlacer deinterlacer = new DataDeinterlacer();
+            List<Short>[] data = deinterlacer.deinterlaceShorts(wvReader.allShorts(), infoReader.getNumChannels());
+
+            if (scale) {
+                writer.write(System.out, scaler.scaleShorts(data, infoReader.getGains()), infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
+            } else {
+                writer.write(System.out, scaler.scaleShorts(data, 1), infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
+            }
+
+        } catch (IOException | InfoReaderException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     /**
      * Outputs the raw unscaled output.
      * @param inputPrefix Prefix of input file.
-     * @param noHeaders Flag to not print headers.
+     * @param noHeaders Flag to not print data headers.
      */
     public void generateRawOutput(String inputPrefix, boolean noHeaders) {
-        try {
-            InfoReader infoReader = new InfoReader(inputPrefix);
-
-            if (!noHeaders) {
-                for (String s : infoReader.getChannelNames()) {
-                    System.out.printf("%s\t", s);
-                }
-                System.out.println();
-            }
-
-            WvReader wvReader = new WvReader(new File(inputPrefix + ".wv"));
-            List<Short> shorts = wvReader.allShorts();
-
-            int currentCounter = 0;
-            for (Short s : shorts) {
-                System.out.printf("%d\t", s);
-                if (currentCounter % infoReader.getNumChannels() == infoReader.getNumChannels() - 1) System.out.println();
-            }
-
-        } catch (IOException | InfoReaderException e) {
-            System.err.println(e.getMessage());
-        }
+        generateOutput(inputPrefix, false, noHeaders);
     }
 
+    /**
+     * Generates a physionet header.
+     * @param inputPrefix Prefix of input file.
+     */
     public void generatePhysioNetOutput(String inputPrefix) {
-
-    }
-
-    @SuppressWarnings("unchecked")
-    public void generateScaledOutput(String inputPrefix, boolean noHeaders) {
-
         try {
             InfoReader infoReader = new InfoReader(inputPrefix);
+            PhysioNetHeaderWriter physioNetHeaderWriter = new PhysioNetHeaderWriter(infoReader);
 
-            if (!noHeaders) {
-                for (int c = 0; c < infoReader.getChannelNames().size(); c++) {
-                    System.out.printf("%s(%s)\t", infoReader.getChannelNames().get(c), infoReader.getUnits().get(c));
-                }
-                System.out.println();
-            }
-
-            WvReader wvReader = new WvReader(new File(inputPrefix + ".wv"));
-            List<Short> shorts = wvReader.allShorts();
-
-            DataDeinterlacer ddi = new DataDeinterlacer();
-            DataScaler ds = new DataScaler();
-
-            List<Short>[] deinterlacedData = ddi.deinterlaceShorts(shorts, infoReader.getNumChannels());
-            List<Double>[] scaledDeinterlacedData = new List[infoReader.getNumChannels()];
-            for (int c = 0; c < infoReader.getNumChannels(); c++) {
-                scaledDeinterlacedData[c] = ds.scaleShorts(deinterlacedData[c], infoReader.getGains().get(c));
-            }
-
-            for (int c = 0; c < shorts.size(); c++) {
-                System.out.printf("%f\t", scaledDeinterlacedData[c % infoReader.getNumChannels()].get(c / infoReader.getNumChannels()));
-                if (c % infoReader.getNumChannels() == infoReader.getNumChannels() - 1) System.out.println();
-            }
-
-        } catch (IOException | InfoReaderException e) {
+        } catch (FileNotFoundException | InfoReaderException e) {
             System.err.println(e.getMessage());
         }
+    }
 
+    /**
+     * Generates scaled output.
+     * @param inputPrefix Prefix of input file.
+     * @param noHeaders Flag to not print data headers.
+     */
+    public void generateScaledOutput(String inputPrefix, boolean noHeaders) {
+        generateOutput(inputPrefix, true, noHeaders);
     }
 }
