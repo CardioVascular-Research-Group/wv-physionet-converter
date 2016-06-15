@@ -22,6 +22,7 @@ public class AmplitudeWriter {
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(startTime);
+        calendar.set(Calendar.MILLISECOND, 0);
 
         // Millisecond increment per data point
         double increment = 1000.0 / samplingFrequency;
@@ -42,6 +43,7 @@ public class AmplitudeWriter {
         for (int c = 0; c < maxLength; c++) {
             // Print date.
             printWriter.printf("%s\t", format.format(calendar.getTime()));
+            calendar.add(Calendar.MILLISECOND, (int)increment);
             for (int d = 0; d < data.length; d++) {
                 if (c < data[d].size()) {
                     printWriter.printf("%f\t", data[d].get(c));
