@@ -7,6 +7,7 @@ import edu.jhu.icm.wvtools.util.DataScaler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,9 +28,12 @@ public class WvToolsFacade {
             List<Short>[] data = deinterlacer.deinterlaceShorts(wvReader.allShorts(), infoReader.getNumChannels());
 
             if (scale) {
-                writer.write(System.out, scaler.scaleShorts(data, infoReader.getGains()), infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
+                // If scaled, labels consist of channel names w/ units in parentheses
+                List<String> labels = new ArrayList<>();
+                for (int c = 0; c < infoReader.getChannelNames().size(); c++) labels.add(infoReader.getChannelNames().get(c) + "(" + infoReader.getUnits().get(c) + ")");
+                writer.write(System.out, scaler.scaleShorts(data, infoReader.getGains()), labels, infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
             } else {
-                writer.write(System.out, scaler.scaleShorts(data, 1), infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
+                writer.write(System.out, scaler.scaleShorts(data, 1), infoReader.getChannelNames(), infoReader.getSampleRate(), infoReader.getStartDate(), noHeaders);
             }
 
         } catch (IOException | InfoReaderException e) {
@@ -53,7 +57,9 @@ public class WvToolsFacade {
     public void generatePhysioNetOutput(String inputPrefix) {
         try {
             InfoReader infoReader = new InfoReader(inputPrefix);
-            PhysioNetHeaderWriter physioNetHeaderWriter = new PhysioNetHeaderWriter(infoReader);
+            WvReader wvReader = new WvReader(new File(inputPrefix + ".wv"));
+            PhysioNetHeaderWriter physioNetHeaderWriter = new PhysioNetHeaderWriter(infoReader, wvReader);
+            physioNetHeaderWriter.write(System.out);
 
         } catch (FileNotFoundException | InfoReaderException e) {
             System.err.println(e.getMessage());
