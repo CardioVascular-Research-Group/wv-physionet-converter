@@ -1,9 +1,6 @@
 package edu.jhu.icm.wvtools.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +10,8 @@ import java.util.List;
  */
 public class WvReader {
 
-    private FileInputStream inputStream;
+    private File file;
+    private List<Short> results;
 
     /**
      * Construct a reader to read from file.
@@ -21,7 +19,7 @@ public class WvReader {
      * @throws FileNotFoundException File not found.
      */
     public WvReader(File file) throws FileNotFoundException {
-        inputStream = new FileInputStream(file);
+        this.file = file;
     }
 
     /**
@@ -29,7 +27,7 @@ public class WvReader {
      * @return Next signed value, if one is to be found. Null if end of file reached.
      * @throws IOException If I/O error encountered.
      */
-    private Short nextShort() throws IOException {
+    private Short nextShort(InputStream inputStream) throws IOException {
         int lowerByte = inputStream.read();
         int upperByte = inputStream.read();
 
@@ -38,25 +36,20 @@ public class WvReader {
     }
 
     /**
-     * Closes the input stream.
-     */
-    private void close() throws IOException {
-        inputStream.close();
-    }
-
-    /**
      * Returns all shorts from file.
      * @return List of shorts.
      * @throws IOException
      */
     public List<Short> allShorts() throws IOException {
-        List<Short> result = new ArrayList<>();
+        if (results != null) return results;
+        results = new ArrayList<>();
+        FileInputStream inputStream = new FileInputStream(file);
         Short currentValue;
-        while ((currentValue = nextShort()) != null) {
-            result.add(currentValue);
+        while ((currentValue = nextShort(inputStream)) != null) {
+            results.add(currentValue);
         }
-        close();
-        return result;
+        inputStream.close();
+        return results;
     }
 
     /**

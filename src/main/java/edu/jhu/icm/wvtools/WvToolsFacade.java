@@ -58,10 +58,10 @@ public class WvToolsFacade {
         try {
             InfoReader infoReader = new InfoReader(inputPrefix);
             WvReader wvReader = new WvReader(new File(inputPrefix + ".wv"));
-            PhysioNetHeaderWriter physioNetHeaderWriter = new PhysioNetHeaderWriter(infoReader, wvReader);
+            PhysioNetHeaderWriter physioNetHeaderWriter = new PhysioNetHeaderWriter(inputPrefix, infoReader, wvReader);
             physioNetHeaderWriter.write(System.out);
 
-        } catch (FileNotFoundException | InfoReaderException e) {
+        } catch (IOException | InfoReaderException e) {
             System.err.println(e.getMessage());
         }
     }
