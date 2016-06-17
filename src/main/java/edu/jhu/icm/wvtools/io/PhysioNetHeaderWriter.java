@@ -51,7 +51,7 @@ public class PhysioNetHeaderWriter {
         // Record line: name # signals, # samples per signal
         writer.printf("%s %d %d\n", prefix, infoReader.getNumChannels(), wvReader.allShorts().size() / infoReader.getNumChannels());
         for (int c = 0; c < infoReader.getNumChannels(); c++) {
-            writer.printf("%s.dat 16 %f/%s 16 0 0 %d 0 %s", prefix, 1.0 / infoReader.getGains().get(c), infoReader.getUnits().get(c), calculator.getShort(c), infoReader.getChannelNames().get(c));
+            writer.printf("%s.dat 16 %f/%s 16 0 0 %d 0 %s\n", prefix, 1.0 / infoReader.getGains().get(c), infoReader.getUnits().get(c), calculator.getShort(c), infoReader.getChannelNames().get(c));
         }
 
         writer.flush();
